@@ -101,9 +101,27 @@ class MonitorAnalyticsTransform {
         ClassReader cr = new ClassReader(srcClass)
         cr.accept(classVisitor, ClassReader.SKIP_FRAMES)
         if (!classVisitor.changed) {
-            return null
+            // 没有实际改动时：
+            //   - 原始字节已带 StackMapTable（或 class 版本 < 50，本来就不需要帧）→ 原样返回，省掉算帧开销
+            //   - 原始字节缺帧且版本 >= 50（老编译产物）→ D8 仍会报警告，继续走 COMPUTE_FRAMES 补齐
+            int majorVersion = ((srcClass[6] & 0xff) << 8) | (srcClass[7] & 0xff)
+            if (majorVersion < 50 || hasStackMapTable(srcClass)) {
+                return null
+            }
         }
         return classWriter.toByteArray()
+    }
+
+    /**
+     * class 文件里是否已经存在 StackMapTable 属性。
+     * 用 ISO-8859-1 转字符串后做一次查找（等价于字节搜索，但不走 Groovy 逐字节循环，速度差异很大）。
+     */
+    private static boolean hasStackMapTable(byte[] classBytes) {
+        if (classBytes == null || classBytes.length < 15) {
+            return false
+        }
+        String text = new String(classBytes, java.nio.charset.StandardCharsets.ISO_8859_1)
+        return text.contains('StackMapTable')
     }
 
     static File modifyJar(File jarFile, File tempDir, boolean nameHex, MonitorConfig monitorConfig, ClasspathClassIndex classIndex) {

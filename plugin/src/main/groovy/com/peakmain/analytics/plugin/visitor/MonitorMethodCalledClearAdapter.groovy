@@ -21,7 +21,8 @@ class MonitorMethodCalledClearAdapter extends MonitorDefalutMethodAdapter {
     private int mAccess
     private MonitorConfig monitorConfig
     private String mDesc
-    private PeakmainVisitor owner
+    // visitMethodInsn 的形参里有 owner，字段换名避免被遮蔽
+    private PeakmainVisitor peakmainVisitor
     /**
      * Constructs a new {@link MonitorMethodCalledClearAdapter}.
      *
@@ -30,13 +31,13 @@ class MonitorMethodCalledClearAdapter extends MonitorDefalutMethodAdapter {
      * @param name the method's name.
      * @param desc
      */
-    MonitorMethodCalledClearAdapter(MethodVisitor mv, int access, String name, String desc, String className, MonitorConfig monitorConfig, PeakmainVisitor owner = null) {
+    MonitorMethodCalledClearAdapter(MethodVisitor mv, int access, String name, String desc, String className, MonitorConfig monitorConfig, PeakmainVisitor peakmainVisitor = null) {
         super(mv, access, name, desc)
         mClassName = className
         mAccess = access
         mDesc = desc
         this.monitorConfig = monitorConfig
-        this.owner = owner
+        this.peakmainVisitor = peakmainVisitor
     }
 
     @Override
@@ -46,8 +47,8 @@ class MonitorMethodCalledClearAdapter extends MonitorDefalutMethodAdapter {
             if (monitorConfig.enableLog) {
                 println("调用方法的class:" + mClassName + ",方法的名字:" + name + ",方法的描述符：" + descriptor)
             }
-            if (this.owner != null) {
-                this.owner.changed = true
+            if (this.peakmainVisitor != null) {
+                this.peakmainVisitor.changed = true
             }
             clearMethodBody(mv, mClassName, access, name, descriptor, mDesc)
             return

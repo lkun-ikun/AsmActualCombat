@@ -19,7 +19,9 @@ class MonitorMethodCalledReplaceAdapter extends MonitorDefalutMethodAdapter {
     private ClassVisitor classVisitor
     private String mClassName
     private MonitorConfig monitorConfig
-    private PeakmainVisitor owner
+    // 注意：visitMethodInsn 的形参里已经有 owner（被调用方法的 owner），
+    // 所以这个字段必须换个名字，否则会被形参遮蔽。
+    private PeakmainVisitor peakmainVisitor
     /**
      * Constructs a new {@link AdviceAdapter}.
      *
@@ -27,13 +29,13 @@ class MonitorMethodCalledReplaceAdapter extends MonitorDefalutMethodAdapter {
      * @param name the method's name.
      * @param desc
      */
-    MonitorMethodCalledReplaceAdapter(MethodVisitor mv, int access, String name, String desc, ClassVisitor classVisitor, String className, MonitorConfig monitorConfig, PeakmainVisitor owner = null) {
+    MonitorMethodCalledReplaceAdapter(MethodVisitor mv, int access, String name, String desc, ClassVisitor classVisitor, String className, MonitorConfig monitorConfig, PeakmainVisitor peakmainVisitor = null) {
         super(mv, access, name, desc)
         mAccess = access
         this.classVisitor = classVisitor
         mClassName = className
         this.monitorConfig = monitorConfig
-        this.owner = owner
+        this.peakmainVisitor = peakmainVisitor
     }
 
     @Override
@@ -70,8 +72,8 @@ class MonitorMethodCalledReplaceAdapter extends MonitorDefalutMethodAdapter {
             }
             MethodCalledBean bean = methodReplaceBeans.get(desc)
             super.visitMethodInsn(bean.newOpcode, bean.newMethodOwner, bean.newMethodName, bean.newMethodDescriptor.get(descriptor), false)
-            if (owner != null) {
-                owner.changed = true
+            if (peakmainVisitor != null) {
+                peakmainVisitor.changed = true
             }
         } else {
             // 原来这里是每个未命中的调用点都无条件 println（会刷屏上百万行、还拖慢构建），

@@ -143,6 +143,19 @@ class MonitorTransform extends Transform {
             }
         } catch (Exception ignored) {
         }
+        // AGP 7 的 TransformContext.getBootClasspath() 可能为空，这里补上 android.jar，
+        // 否则 android/* 的类型都会解析不到而退化成 java/lang/Object。
+        try {
+            def android = project?.extensions?.findByName('android')
+            if (android != null) {
+                android.bootClasspath?.each { File file ->
+                    if (file != null) {
+                        roots.add(file)
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
         inputs?.each { TransformInput input ->
             input.jarInputs?.each { JarInput jarInput ->
                 if (jarInput.file != null) {
