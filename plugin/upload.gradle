@@ -1,0 +1,26 @@
+
+version = '1.1.2'
+group = 'io.github.peakmain'
+gradlePlugin {
+    plugins {
+        peakmainPlugin {
+            id = 'io.github.peakmain'
+            implementationClass = 'com.peakmain.analytics.plugin.PeakmainPlugin'
+        }
+    }
+}
+pluginBundle {
+    // These settings are set for the whole plugin bundle
+    website = 'https://github.com/Peakmain/AsmActualCombat'
+    vcsUrl = 'https://github.com/Peakmain/AsmActualCombat'
+
+    description = 'Peakmain ASM plugin!'
+
+    plugins {
+        peakmainPlugin {
+            // id is captured from java-gradle-plugin configuration
+            displayName = 'com.peakmain.plugin'
+            tags = ['android', 'asm_plugin']
+        }
+    }
+}

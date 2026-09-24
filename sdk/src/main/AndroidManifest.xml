@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.peakmain.sdk">
+
+    <application>
+        <provider
+            android:name="com.peakmain.sdk.SensorsDataContentProvider"
+            android:authorities="${applicationId}.SensorsDataContentProvider"
+            android:enabled="true"
+            android:exported="false" />
+    </application>
+</manifest>

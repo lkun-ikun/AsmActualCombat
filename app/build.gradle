@@ -1,0 +1,69 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'com.peakmain.plugin'
+}
+android {
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+
+    defaultConfig {
+        applicationId applicationId
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            manifestPlaceholders = [
+                    JPUSH_PKGNAME: applicationId,
+                    JPUSH_APPKEY : jpushKey as String,
+                    JPUSH_CHANNEL: "developer-default",
+            ]
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        dataBinding {
+            enabled true
+        }
+    }
+}
+
+dependencies {
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.3.2'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation project(path: ':sdk')
+    implementation 'com.github.Peakmain:BasicLibrary:+'
+    implementation 'com.github.Peakmain:BasicUI:+'
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    annotationProcessor "com.android.databinding:compiler:3.1.4"
+    implementation(rootProject.ext.dependencies.jpush)
+    implementation 'com.qiniu:qiniu-android-sdk:7.3.15'
+}
+monitorPlugin {
+    whiteList = [
+            "com.peakmain.asmactualcombat.utils.TestUtils",
+            "com.peakmain.plugin"
+    ]
+    methodStatus = 1
+    disableStackMapFrame = false
+    interceptPackageName = "com.peakmain"
+}

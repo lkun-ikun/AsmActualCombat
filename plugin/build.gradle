@@ -1,0 +1,29 @@
+
+plugins {
+    id 'maven-publish'
+    id 'java-gradle-plugin'
+    id 'com.gradle.plugin-publish' version '0.18.0'
+}
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply from :'upload.gradle'
+apply from :'local.gradle'
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+
+    implementation 'org.ow2.asm:asm:9.2'
+    implementation 'org.ow2.asm:asm-commons:9.2'
+    implementation 'org.ow2.asm:asm-analysis:9.2'
+    implementation 'org.ow2.asm:asm-util:9.2'
+    implementation 'org.ow2.asm:asm-tree:9.2'
+    compileOnly 'com.android.tools.build:gradle:4.0.1', {
+        exclude group: 'org.ow2.asm'
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
